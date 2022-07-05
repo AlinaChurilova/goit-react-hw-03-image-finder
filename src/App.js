@@ -19,6 +19,7 @@ class App extends Component {
     showModal: false
   };
 
+
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDowm)
   }
@@ -27,8 +28,12 @@ class App extends Component {
     const { currentPage, queryString } = this.state;
     const options = { queryString, currentPage };
     
+    window.scrollTo({
+    top: 8000,
+    behavior: "smooth"
+});
+    
     if (prevState.queryString !== this.state.queryString) {
-        
           
       this.setState({ loading: true, images: [] })
           
@@ -37,7 +42,6 @@ class App extends Component {
             .catch(error => this.setState({error}))
             .finally(() => this.setState({ loading: false }));
         
-          
         }
 
     if (prevState.currentPage !== this.state.currentPage) {
@@ -49,10 +53,9 @@ class App extends Component {
               }));
               })
               .catch(error => this.setState({error}))
-              .finally(() => this.setState({ loading: false }));
+          .finally(() => this.setState({ loading: false }));
     }
-        
-      
+    
   }
 
   componentWillUnmount() {
