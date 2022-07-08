@@ -7,7 +7,6 @@ import Button from 'components/Button';
 import Modal from 'components/Modal';
 
 
-
 class App extends Component {
   state = {
     queryString: '',
@@ -19,33 +18,30 @@ class App extends Component {
     showModal: false
   };
 
-
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDowm)
-  }
   
   componentDidUpdate(prevProps, prevState) {
     const { currentPage, queryString } = this.state;
     const options = { queryString, currentPage };
     
-    window.scrollTo({
-    top: 8000,
-    behavior: "smooth"
-});
-    
+    if (this.state.currentPage !== 1) {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "smooth"
+      })
+    };
     if (prevState.queryString !== this.state.queryString) {
           
-      this.setState({ loading: true, images: [] })
+      this.setState({ loading: true, images: []})
           
-        Api(options)
+      Api(options)
             .then(images => this.setState({ images: images.hits }))
             .catch(error => this.setState({error}))
             .finally(() => this.setState({ loading: false }));
         
         }
 
-    if (prevState.currentPage !== this.state.currentPage) {
-      this.setState({ loading: true })
+    if (prevState.currentPage !== this.state.currentPage && this.state.currentPage!==1) {
+      this.setState({ loading: true})
         Api(options)
           .then(images => {
             this.setState(prevState => ({
@@ -57,10 +53,6 @@ class App extends Component {
     }
     
   }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDowm);
-  }
   
   handleKeyDowm = e => {
       if (e.code === 'Escape') {
@@ -71,12 +63,16 @@ class App extends Component {
   handleLoadMore = () => {
       this.setState(prevState => ({
           currentPage: prevState.currentPage + 1,
-            }));   
-        } 
+      }));  
+  } 
   
-  handleFormSubmit = galleryItem => {
-      this.setState({ queryString: galleryItem });
-        }
+  
+  handleFormSubmit = (galleryItem) => {
+    this.setState({
+      currentPage: 1,
+      queryString: galleryItem,
+    });
+      }
   
   getBigImage = (largeImage) => {
       this.toggleModal();
@@ -99,21 +95,18 @@ class App extends Component {
   render() {
     const { loading, images, showModal } = this.state;
   
-    
     return (
       
       <div>
 
-        {showModal && <Modal toogleModal={this.onClose}>{ this.state.largeImage}</Modal>} 
+        {showModal && <Modal toogleModal={this.onClose} keyCloseModal={this.handleKeyDowm }>{this.state.largeImage}</Modal>} 
         <SearchBar onSubmit={this.handleFormSubmit} />
         {loading && <Loader />}  
         {images &&  <ImageGallery images={images} bigImage={this.getBigImage} />}
         {!!images.length && (loading ? <Loader /> : <Button onClick={this.handleLoadMore} />)}
     
-     
       </div>
     )
-   
   };
 }
 
